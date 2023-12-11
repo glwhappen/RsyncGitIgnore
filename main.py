@@ -23,21 +23,46 @@ def load_gitignore_rules(gitignore_file_path):
 
 
 
-def apply_gitignore(root, dirs, files, spec, exclude_list, gitignore_path, source_dir):
+def apply_gitignore(root, dirs, files, spec, exclude_list, source_dir):
+    # os.chdir(root)  # 切换到 .gitignore 文件所在目录
+    print(root, dirs)
     for name in dirs + files:
         full_path = os.path.join(root, name)
-        relative_path = os.path.relpath(full_path, start=source_dir)  # 相对于源目录的路径
+        print("full_path", full_path)
+        # 将完整路径转换为相对于源目录的路径
+        relative_path_to_source = os.path.relpath(full_path, start=source_dir)
+        # 将完整路径转换为相对于当前 .gitignore 文件所在目录的路径
+        relative_path_to_gitignore = os.path.relpath(full_path, start=root)
+        print("relative_path_to_source", relative_path_to_source, spec.match_file(relative_path_to_source))
+        print("relative_path_to_gitignore", relative_path_to_gitignore, spec.match_file(relative_path_to_gitignore + '/'))
+        # relative_path_to_gitignore_unix = relative_path_to_gitignore.replace('\\', '/')
 
-        # 转换为 Cygwin 格式
-        cygwin_relative_path = windows_to_cygwin_path(relative_path)
+        # 如果是目录，则在路径末尾添加斜杠
+        if os.path.isdir(full_path):
+            relative_path_to_gitignore += '/'
+        is_ignored = spec.match_file(relative_path_to_gitignore)
 
-        is_ignored = spec.match_file(relative_path)
+        
+        # print("relative_path_to_gitignore_unix", relative_path_to_gitignore_unix, spec.match_file(relative_path_to_gitignore_unix))
+
+        # 使用相对于 .gitignore 文件的路径进行匹配
+        # is_ignored = spec.match_file(relative_path_to_gitignore)
+        # print()
         if is_ignored:
-            exclude_list.add(windows_to_cygwin_path(relative_path).replace('\\', '/'))
+            exclude_list.add(windows_to_cygwin_path(relative_path_to_source).replace('\\', '/'))
 
             if name in dirs:
                 dirs.remove(name)  # 从遍历列表中移除被忽略的目录
 
+# def apply_gitignore(root, dirs, files, spec, exclude_list, source_dir):
+#     for name in dirs + files:
+#         full_path = os.path.join(root, name)
+#         relative_path_to_source = os.path.relpath(full_path, start=source_dir).replace('\\', '/')
+#         relative_path_to_gitignore = os.path.relpath(full_path, start=root).replace('\\', '/')
+#         print(relative_path_to_gitignore, spec.match_file(relative_path_to_gitignore))
+#         is_ignored = spec.match_file(relative_path_to_gitignore)
+#         if is_ignored:
+#             exclude_list.add(relative_path_to_source)
 
 
 
@@ -55,9 +80,13 @@ def main():
         gitignore_path = os.path.join(root, '.gitignore')
         # print(gitignore_path)
         if os.path.isfile(gitignore_path):
+            # 让python切换到gitignore_path所在的目录
+            
+
             spec = load_gitignore_rules(gitignore_path)
             # print(spec)
-            apply_gitignore(root, dirs, files, spec, exclude_list, gitignore_path, source_dir)
+            
+            apply_gitignore(root, dirs, files, spec, exclude_list, source_dir)
 
 
     # 转换为 Cygwin 路径格式用于 rsync 命令
