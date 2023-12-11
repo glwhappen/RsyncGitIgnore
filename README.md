@@ -39,3 +39,4 @@ python main.py
 
 程序将读取 `config.yml` 文件，并根据任何文件夹下 `.gitignore` 文件中的规则将源目录备份到目标目录。
 
+![https://raw.githubusercontent.com/glwhappen/images/main/img/202312120121921.png]

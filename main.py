@@ -4,6 +4,10 @@ import subprocess
 import pathspec
 import yaml # pip install PyYAML
 
+import logging
+logging.basicConfig(filename='backup.log', level=logging.INFO, 
+                    format='%(asctime)s %(levelname)s:%(message)s', encoding='utf-8')
+
 def windows_to_cygwin_path(path):
     """ 将 Windows 风格的路径转换为 Cygwin 风格的路径 """
     if re.match(r'[a-zA-Z]:\\', path):
@@ -85,6 +89,7 @@ def rsync_backup(source_dir, dest_dir):
     rsync_command.extend([cygwin_source_dir, cygwin_dest_dir])
 
     print(rsync_command)
+    logging.info('Executing command: %s', ' '.join(rsync_command))
     # 执行 rsync
     subprocess.run(rsync_command)
 
