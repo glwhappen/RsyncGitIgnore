@@ -1,4 +1,3 @@
-import configparser
 import os
 import re
 import subprocess
@@ -15,14 +14,7 @@ def windows_to_cygwin_path(path):
 def load_gitignore_rules(gitignore_file_path):
     with open(gitignore_file_path, 'r', encoding='utf-8') as file:
         spec = pathspec.PathSpec.from_lines('gitwildmatch', file)
-
-    # 打印 spec 中的规则的字符串表示
-    # print("Loaded .gitignore rules from", gitignore_file_path)
-    # for pattern in spec.patterns:
-        # print("  Rule:", pattern.pattern)
-
     return spec
-
 
 
 def apply_gitignore(root, dirs, files, spec, exclude_list, source_dir):
@@ -35,32 +27,25 @@ def apply_gitignore(root, dirs, files, spec, exclude_list, source_dir):
         relative_path_to_source = os.path.relpath(full_path, start=source_dir)
         # 将完整路径转换为相对于当前 .gitignore 文件所在目录的路径
         relative_path_to_gitignore = os.path.relpath(full_path, start=root)
-        # print("relative_path_to_source", relative_path_to_source, spec.match_file(relative_path_to_source))
-        # print("relative_path_to_gitignore", relative_path_to_gitignore, spec.match_file(relative_path_to_gitignore + '/'))
-        # relative_path_to_gitignore_unix = relative_path_to_gitignore.replace('\\', '/')
 
         # 如果是目录，则在路径末尾添加斜杠
         if os.path.isdir(full_path):
             relative_path_to_gitignore += '/'
         is_ignored = spec.match_file(relative_path_to_gitignore)
 
-        
-        # print("relative_path_to_gitignore_unix", relative_path_to_gitignore_unix, spec.match_file(relative_path_to_gitignore_unix))
-
-        # 使用相对于 .gitignore 文件的路径进行匹配
-        # is_ignored = spec.match_file(relative_path_to_gitignore)
-        # print()
         if is_ignored:
             exclude_list.add(windows_to_cygwin_path(relative_path_to_source).replace('\\', '/'))
 
             if name in dirs:
                 dirs.remove(name)  # 从遍历列表中移除被忽略的目录
+
+
 # Load the YAML configuration file
 with open('config.yml', 'r', encoding='utf-8') as file:
     config = yaml.safe_load(file)
 
-def read_backup_list():
 
+def read_backup_list():
     source_dirs = config['paths']['source_dirs']
     dest_dir = config['paths']['dest_dir']
 
