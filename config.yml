@@ -1,7 +1,9 @@
 paths:
   source_dirs:
-    - C:\happen\code\模拟备份
-    - C:\happen\code\模拟备份2
-  dest_dir: C:\happen\code\备份
+    - C:\happen\WebStorm
+    - C:\happen\PyCharm
+    - C:\happen\照片
+  dest_dir: E:\备份
 config:
-  delete: false # 是否同步删除
+  delete: false # 是否同步删除，true为删除，false为不删除，请检查dest_dir是否正确，如果设置不正确，可能会删除您的文件
+  progress: true # 是否显示进度条
